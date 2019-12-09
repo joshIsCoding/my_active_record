@@ -15,8 +15,8 @@ class SQLObject
 
   def self.finalize!
     self.columns.each do |attribute|
-      define_method(attribute) { attributes[attribute] }
-      define_method(attribute.to_s + "=") { |value| attributes[attribute] = value }
+      define_method(attribute) { attributes[attribute] } # attribute getter methods
+      define_method(attribute.to_s + "=") { |value| attributes[attribute] = value } # attribute setter methods
     end
   end
 
@@ -41,7 +41,11 @@ class SQLObject
   end
 
   def initialize(params = {})
-    # ...
+    params.each do |attr_name, value|
+      attr_sym = attr_name.to_sym # ensure attr_name is passed as a symbol
+      raise "unknown attribute '#{attr_sym}'" unless self.class.columns.include?(attr_sym)
+      self.send(("#{attr_sym}=").to_sym, value)
+    end
   end
 
   def attributes
