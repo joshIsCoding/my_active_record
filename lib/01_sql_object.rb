@@ -45,7 +45,18 @@ class SQLObject
   end
 
   def self.find(id)
-    # ...
+    object_params = DBConnection.execute(<<-SQL).first
+    SELECT
+      *
+    FROM
+      #{self.table_name}
+    WHERE
+      id = #{id}
+    LIMIT
+      1
+    SQL
+    return self.new(object_params) if object_params
+    nil
   end
 
   def initialize(params = {})
