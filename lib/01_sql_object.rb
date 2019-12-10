@@ -103,7 +103,7 @@ class SQLObject
     SQL
   end
 
-  def save
-    # ...
+  def save # user-accessible method to update/insert a record as determined by the program
+    self.id.nil? ? self.insert : self.update
   end
 end
