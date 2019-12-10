@@ -30,7 +30,12 @@ end
 
 class HasManyOptions < AssocOptions
   def initialize(name, self_class_name, options = {})
-    # ...
+    @foreign_key, @primary_key, @class_name = options[:foreign_key], options[:primary_key], options[:class_name]
+    
+    # association name passed as plural by definition of having many ______
+    @foreign_key ||= "#{self_class_name.underscore.downcase}_id".to_sym
+    @primary_key ||= :id
+    @class_name ||= name.to_s.camelcase.singularize
   end
 end
 
