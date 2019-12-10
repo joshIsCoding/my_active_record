@@ -92,7 +92,15 @@ class SQLObject
   end
 
   def update
-    # ...
+    set_columns = self.class.columns.map{ |col| "#{col} = ?"} # generate column names in SQL-interpolation-ready format
+    DBConnection.execute(<<-SQL, *attribute_values, self.id)
+    UPDATE
+      #{self.class.table_name}
+    SET
+      #{set_columns.join(", ")}
+    WHERE
+      id = ?
+    SQL
   end
 
   def save
