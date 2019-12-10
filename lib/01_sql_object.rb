@@ -72,11 +72,23 @@ class SQLObject
   end
 
   def attribute_values
-    # ...
+    self.class.columns.map do |attr|
+      self.send(attr)
+    end
   end
 
   def insert
-    # ...
+    column_names = self.class.columns # array of target fields to be joined later
+    interpolation_markers = (["?"] * column_names.length).join(", ") # number of "?"s determined by number of target fields for insertion
+    # splat ensures attribute values passed as individual arguments
+    DBConnection.execute(<<-SQL, *attribute_values) 
+    INSERT INTO
+      #{self.class.table_name} (#{column_names.join(", ")})
+    VALUES
+      (#{interpolation_markers})
+    SQL
+
+    self.id = DBConnection.last_insert_row_id # id generated upon insertion and must be stored within the instance
   end
 
   def update
