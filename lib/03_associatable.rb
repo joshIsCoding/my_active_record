@@ -42,7 +42,22 @@ end
 module Associatable
   # Phase IIIb
   def belongs_to(name, options = {})
-    # ...
+    belongs_to_options = BelongsToOptions.new(name, options)
+    define_method(name) do
+      foreign_key = self.send(belongs_to_options.foreign_key)
+      sql_rec = DBConnection.execute(<<-SQL, foreign_key).first
+        SELECT
+          *
+        FROM
+          #{belongs_to_options.table_name}
+        WHERE
+          id = ?
+        LIMIT
+          1
+      SQL
+      return sql_rec.nil? ? nil : belongs_to_options.model_class.new(sql_rec)
+    end
+      
   end
 
   def has_many(name, options = {})
@@ -56,4 +71,5 @@ end
 
 class SQLObject
   # Mixin Associatable here...
+  extend Associatable
 end
