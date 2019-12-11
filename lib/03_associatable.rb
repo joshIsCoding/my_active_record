@@ -51,7 +51,7 @@ module Associatable
         FROM
           #{belongs_to_options.table_name}
         WHERE
-          id = ?
+          #{belongs_to_options.primary_key} = ?
         LIMIT
           1
       SQL
